@@ -37,6 +37,7 @@ def is_number(number: str) -> bool:
 
 
 def check_lexicon(equation: str) -> bool:
+    # TODO check that max pox not more than 2.
     if '=' in equation and any(i in equation for i in numbers) and any(i for i in allowed_symbols):
         if equation.replace(' ', ''):
             for i in equation.replace(' ', ''):
@@ -62,12 +63,17 @@ def check_syntax(equation: str) -> bool:
                 print("Last term reached!")
                 return True
         elif equation[i] in symbols:
-            print(f"symbol: {equation[i]} {i}")
-            # if item is -, +, = check next or previous symbol should be a term.
-            if is_number(equation[i - 1]) or is_term(term=equation[i - 1]) and (is_number(number=equation[i + 1])
-                                                                                or is_term(term=equation[i + 1])):
-                continue
+            # if not first or last symbol
+            if i != 0 and i != len(equation) - 1:
+                print(f"symbol: {equation[i]} {i}")
+                # if item is -, +, = check next or previous symbol should be a term.
+                if is_number(equation[i - 1]) or is_term(term=equation[i - 1]) or is_number(number=equation[i + 1]) or is_term(term=equation[i + 1]):
+                    continue
+                else:
+                    print("Wrong position of sign")
+                    return False
             else:
+                print("Don't put sign at start or finish of equation.")
                 return False
         else:
             print(f"Some shit in the input {equation[i]}")
