@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from sys import argv
+from re import findall
 
 allowed_symbols = ['X', '+', '-', '=', '^', '*', '.']
 numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -15,8 +16,8 @@ def is_term(term: str) -> bool:
         number = term.split('*')
         try:
             float(number[0])
-            # print(f"{number} is Term")
-            return True
+            if findall(r'X\^[0-2]', number[1]) or number[1] == 'X':
+                return True
         except ValueError:
             # print(f'{number} Not a Term')
             return False
@@ -44,28 +45,30 @@ def check_lexicon(equation: str) -> bool:
                 if i not in allowed_symbols + numbers:
                     return False
             return True
-    return False
+        else:
+            return False
+    else:
+        return False
 
 
 def check_syntax(equation: str) -> bool:
     equation = equation.replace(' * ', '*')
     equation = equation.split(' ')
     print(equation)
-    # if is_number(equation[0]) or equation[0] == 'X' or equation[0] == 'X^2':
+
     for i in range(len(equation)):
         if is_number(number=equation[i]) or is_term(term=equation[i]):
-            print(f"number or term: {equation[i]}")
+            # print(i)
+            # print(f"number or term: {equation[i]}")
             # check if not last item
             if i != len(equation) - 1:
                 if equation[i + 1] in symbols:
                     continue
             else:
-                print("Last term reached!")
                 return True
         elif equation[i] in symbols:
             # if not first or last symbol
             if i != 0 and i != len(equation) - 1:
-                print(f"symbol: {equation[i]} {i}")
                 # if item is -, +, = check next or previous symbol should be a term.
                 if is_number(equation[i - 1]) or is_term(term=equation[i - 1]) or is_number(number=equation[i + 1]) or is_term(term=equation[i + 1]):
                     continue
@@ -80,6 +83,22 @@ def check_syntax(equation: str) -> bool:
             return False
 
 
+def get_degree(equation: str) -> str:
+    degree = []
+    equation = equation.replace(' * ', '*')
+    equation = equation.split(' ')
+    print(equation)
+    for i in equation:
+        if findall(r'X\^[0-2]', i):
+            term = i.split('^')
+            degree.append(term[-1])
+        elif i == 'X':
+            degree.append('1')
+    degree.sort()
+    print(degree)
+    return degree[-1]
+
+
 def parser():
     if len(argv) == 1:
         print("You didn't put any parameter!")
@@ -88,10 +107,11 @@ def parser():
     else:
         terms = {}
         equation = argv[1]
-        if check_lexicon(equation=equation):
-            print("Lexicon is ok!")
-        if check_syntax(equation=equation):
-            print("Syntax is ok!")
+        if check_lexicon(equation=equation) and check_syntax(equation=equation):
+            print("Equation is ok!")
+            degree = get_degree(equation=equation)
+            print(f"Polynomial degree: {degree}")
+            # TODO some stuff here.
         else:
             print("Wrong input!")
 
