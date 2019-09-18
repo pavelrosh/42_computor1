@@ -16,7 +16,7 @@ def is_term(term: str) -> bool:
         except ValueError:
             # print(f'{number} Not a Term')
             return False
-    elif term == 'X' or term == 'X^2':
+    elif term == 'X' or term == 'X^1' or term == 'X^2' or term == 'X^3':
         return True
     else:
         return False

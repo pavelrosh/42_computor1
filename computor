@@ -7,6 +7,19 @@ numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 symbols = ['+', '-', '=']
 
 
+def get_term(term, sign='+'):
+    return 1, 2
+
+
+def get_data(equation: list):
+    i = 0
+    data = {"num": [], 'X^0': [], 'X^1': [], 'X^2': []}
+    while i < len(equation):
+        if is_number(number=equation[i]) or is_term(term=equation[i]):
+            k, v = get_term(term=equation[i])
+        if equation[i] == '+' or equation[i] == '-':
+            k, v = get_term(term=equation[i + 1], sign=equation[i])
+
 def change_operation(sign):
     return '+' if sign == '-' else '-'
 
@@ -17,7 +30,6 @@ def solver():
 
 def move_terms_to_left(equation):
     equation = equation.replace(' * ', '*').split(' ')
-    print(equation)
     right_side = []
     left_side = []
     for i in equation[::-1]:
@@ -33,7 +45,7 @@ def move_terms_to_left(equation):
             left_side.append(i)
     right_side = right_side[::-1]
     tmp_right = [i for i in right_side]
-
+    result = []
     i = 0
     while i < len(right_side):
         if is_number(number=right_side[i]) or is_term(term=right_side[i]):
@@ -54,30 +66,23 @@ def move_terms_to_left(equation):
             i += 1
             tmp_right.pop(0)
         tmp_right.pop(0)
-        print(left_side + ['='] + (tmp_right if tmp_right else ['0']))
+        result= left_side + ['='] + (tmp_right if tmp_right else ['0'])
+        print(' '.join(result))
         i += 1
+    return result
 
 
-# def get_reduced_form(equation: str) -> list:
-#     equation = equation.replace(' * ', '*').split(' ')
-#     print(equation)
-#     right_side = []
-#     for i in equation[::-1]:
-#         if i == '=':
-#             break
-#         else:
-#             right_side.append(i)
-#     right_side = right_side[::-1]
-#     print(right_side)
-#     # right_side.
-#     print(equation)
+def reducer(equation: list):
+    pass
 
 
 def main():
     if parser():
         equation = argv[1]
         get_degree(equation=equation)
-        move_terms_to_left(equation=equation)
+        equation = move_terms_to_left(equation=equation)
+        equation = get_data(equation=equation)
+        reducer(equation=equation)
         # solver(equation=equation)
     else:
         print("Wrong input!")
