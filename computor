@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from sys import argv
 from parser import parser, get_degree, is_term, is_number
+from re import findall
 
 allowed_symbols = ['X', '+', '-', '=', '^', '*', '.']
 numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -8,17 +9,43 @@ symbols = ['+', '-', '=']
 
 
 def get_term(term, sign='+'):
-    return 1, 2
+    def get_number(x): return -float(x) if sign == '-' else float(x)
+
+    if is_number(number=term):  # 5
+        return '', get_number(term)
+    elif is_term(term=term):
+        if term == 'X^0':
+            return '', get_number(1)
+        elif term == 'X' or term == 'X^1':  # X
+            return 'X', get_number(1)
+        elif '*' in term:  # 5 * X^2(0,1), 5 * X
+            term = term.split('*')
+            number = term[0]
+            if term[1] == 'X^0':
+                return '', get_number(number)
+            elif term[1] == 'X' or term[1] == 'X^1':  # 5 * X
+                return 'X', get_number(number)
+            elif findall(r'X\^[0-2]', term[1]):  # 5 * X^2
+                return 'X^' + term[-1].split('^')[-1], get_number(number)
+        elif findall(r'X\^[0-2]', term):  # X^2
+            return 'X^' + term.split('^')[-1], get_number(1)
 
 
 def get_data(equation: list):
     i = 0
-    data = {"num": [], 'X^0': [], 'X^1': [], 'X^2': []}
+    data = {"": [], 'X^0': [], 'X': [], 'X^2': []}
     while i < len(equation):
         if is_number(number=equation[i]) or is_term(term=equation[i]):
             k, v = get_term(term=equation[i])
-        if equation[i] == '+' or equation[i] == '-':
+        elif equation[i] == '+' or equation[i] == '-':
             k, v = get_term(term=equation[i + 1], sign=equation[i])
+            i += 1
+        else:
+            break
+        data[k].append(v)
+        i += 1
+    return data
+
 
 def change_operation(sign):
     return '+' if sign == '-' else '-'
@@ -67,13 +94,29 @@ def move_terms_to_left(equation):
             tmp_right.pop(0)
         tmp_right.pop(0)
         result= left_side + ['='] + (tmp_right if tmp_right else ['0'])
-        print(' '.join(result))
+        # print(' '.join(result))
         i += 1
     return result
 
 
-def reducer(equation: list):
-    pass
+def reducer(data: dict):
+    data = {k: [sum(v)] for k, v in data.items()}
+    result = []
+    for k, v in data.items():
+        if v and v[0]:
+            number = int(v[0]) if v[0].is_integer() else v[0]
+            sign = '+' if number > 0 else '-'
+            number = -number if number < 0 else number
+            result.append(sign)
+            if k:
+                result.append((str(number) + '*' + k) if number != 1 else k)
+            else:
+                result.append((str(number) + k) if number != 1 else k)
+
+    result += ['=', '0']
+    result.pop(0)
+    print(f"Reduced form {' '.join(result)}")
+    return result
 
 
 def main():
@@ -81,8 +124,9 @@ def main():
         equation = argv[1]
         get_degree(equation=equation)
         equation = move_terms_to_left(equation=equation)
-        equation = get_data(equation=equation)
-        reducer(equation=equation)
+        data = get_data(equation=equation)
+        # print(equation)
+        reducer(data=data)
         # solver(equation=equation)
     else:
         print("Wrong input!")
