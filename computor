@@ -42,17 +42,13 @@ def get_data(equation: list):
             i += 1
         else:
             break
+        # print(k, v)
         data[k].append(v)
         i += 1
     return data
 
 
-def change_operation(sign):
-    return '+' if sign == '-' else '-'
-
-
-def solver():
-    pass
+def change_operation(sign): return '+' if sign == '-' else '-'
 
 
 def move_terms_to_left(equation):
@@ -101,6 +97,7 @@ def move_terms_to_left(equation):
 
 def reducer(data: dict):
     data = {k: [sum(v)] for k, v in data.items()}
+    # print(data)
     result = []
     for k, v in data.items():
         if v and v[0]:
@@ -111,23 +108,84 @@ def reducer(data: dict):
             if k:
                 result.append((str(number) + '*' + k) if number != 1 else k)
             else:
-                result.append((str(number) + k) if number != 1 else k)
+                result.append((str(number) + k))
+                # result.append((str(number) + k) if number != 1 else k)
 
-    result += ['=', '0']
-    result.pop(0)
-    print(f"Reduced form {' '.join(result)}")
-    return result
+    def is_solvable():
+        for i in result:
+            if 'X' in i:
+                return True
+        else:
+            return False
+
+    if result:
+        if is_solvable():
+            print(result)
+            result += ['=', '0']
+            result.pop(0)
+            print(f"Reduced form {' '.join(result)}")
+            return result
+        else:
+            print("There no solutions.")
+    else:
+        print("All real numbers are solutions.")
+        return result
+
+
+def solver(data: dict, degree: int):
+    def sqrt(number): return number ** (1/2)
+
+    a = data['X^2'][0] if data['X^2'] else 1
+    b = data['X'][0] if data['X'] else 0
+    c = data[''][0] if data[''] else 1
+
+    # print(b, a, c)
+    d = b * b - 4 * a * c
+    if degree == 2:
+        if d > 0:
+            print("Discriminant is strictly positive, the two solutions are:")
+            x1 = (-b + sqrt(d)) / (2 * a)
+            x2 = (-b - sqrt(d)) / (2 * a)
+            print(round(x1, 6), round(x2, 6))
+        elif d == 0:
+            print("Discriminant is equal to 0, the solution is:")
+            print(round(((-b + sqrt(d)) / (2 * a)), 6))
+        else:
+            print("Discriminant is strictly negative, the two solutions are:")
+            if b == 0:
+                x1 = sqrt(d) / (2 * a)
+                x2 = -sqrt(d) / (2 * a)
+                if round(x1.real) != 0:
+                    x1 = str(round(x1.real, 6)) + ('+' if x1.imag > 0 else ' ') + str(round(x1.imag, 6)) + 'i'
+                    x2 = str(round(x2.real, 6)) + ('-' if x2.imag > 0 else '') + str(round(x2.imag, 6)) + 'i'
+                else:
+                    x1 = str(round(x1.imag, 6)) + 'i'
+                    x2 = str(round(x2.imag, 6)) + 'i'
+            else:
+                comp = sqrt(d) / (2 * a)
+                x1 = round(-b / (2 * a), 6) + comp
+                x2 = round(-b / (2 * a), 6) - comp
+                x1 = str(round(x1.real, 6)) + ('+' if x1.imag > 0 else ' ') + str(round(x1.imag, 6)) + 'i'
+                x2 = str(round(x2.real, 6)) + ('-' if x2.imag > 0 else '') + str(round(x2.imag, 6)) + 'i'
+            print(x1, x2)
+    elif degree == 1:
+        print(f"The solution is:\n{round((-c / b), 6)}")
+    else:
+        print("WHAT?!")
 
 
 def main():
     if parser():
         equation = argv[1]
-        get_degree(equation=equation)
         equation = move_terms_to_left(equation=equation)
-        data = get_data(equation=equation)
         # print(equation)
-        reducer(data=data)
-        # solver(equation=equation)
+        data = get_data(equation=equation)
+        # print(data)
+        data = reducer(data=data)
+        if data:
+            degree = get_degree(equation=' '.join(data))
+            data = get_data(equation=data)
+            solver(data=data, degree=degree)
     else:
         print("Wrong input!")
 

@@ -17,7 +17,7 @@ def is_term(term: str) -> bool:
         except ValueError:
             # print(f'{number} Not a Term')
             return False
-    elif term == 'X' or findall(r'X\^[0-2]', term):
+    elif term == 'X' or (findall(r'X\^[0-2]', term) and len(term) == 3):
         return True
     else:
         return False
@@ -88,7 +88,10 @@ def check_syntax(equation: str) -> bool:
                 print("Don't put sign at start or finish of equation.")
                 return False
         else:
-            print(f"Some shit in the input {equation[i]}")
+            if findall(r'X\^[3-9]', equation[i]):
+                print("The polynomial degree is stricly greater than 2, I can't solve.")
+            else:
+                print(f"Some shit in the input {equation[i]}")
             return False
 
 
@@ -106,7 +109,7 @@ def get_degree(equation: str):
     degree.sort()
     # print(degree)
     print(f"Polynomial degree: {degree[-1]}")
-    # return degree[-1]
+    return int(degree[-1])
 
 
 def parser():
