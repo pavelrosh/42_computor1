@@ -8,14 +8,18 @@ symbols = ['+', '-', '=']
 
 def is_term(term: str) -> bool:
     if '*' in term and 'X' in term:
-        number = term.split('*')
-        try:
-            float(number[0])
-            # print(number[1])
-            if len(number[1]) == 3 and findall(r'X\^[0-2]', number[1]) or number[1] == 'X':
-                return True
-        except ValueError:
-            # print(f'{number} Not a Term')
+        splitted_term = term.split('*')
+        # print(splitted_term)
+        if len(splitted_term) == 1 or len(splitted_term) == 2:
+            try:
+                float(splitted_term[0])
+                # print(number[1])
+                if len(splitted_term[1]) == 3 and findall(r'X\^[0-2]', splitted_term[1]) or splitted_term[1] == 'X':
+                    return True
+            except ValueError:
+                # print(f'{number} Not a Term')
+                return False
+        else:
             return False
     elif term == 'X' or (findall(r'X\^[0-2]', term) and len(term) == 3):
         return True

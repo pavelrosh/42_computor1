@@ -119,10 +119,11 @@ def reducer(data: dict):
             return False
 
     if result:
+        # print(result)
         if is_solvable():
-            print(result)
+            # print(result)
             result += ['=', '0']
-            result.pop(0)
+            result.pop(0) if result[0] == '+' else result
             print(f"Reduced form {' '.join(result)}")
             return result
         else:
@@ -134,12 +135,12 @@ def reducer(data: dict):
 
 def solver(data: dict, degree: int):
     def sqrt(number): return number ** (1/2)
-
+    # print(data)
     a = data['X^2'][0] if data['X^2'] else 1
     b = data['X'][0] if data['X'] else 0
     c = data[''][0] if data[''] else 1
 
-    # print(b, a, c)
+    # print(f"a={a}, b={b}, c={c}")
     d = b * b - 4 * a * c
     if degree == 2:
         if d > 0:
@@ -169,6 +170,7 @@ def solver(data: dict, degree: int):
                 x2 = str(round(x2.real, 6)) + ('-' if x2.imag > 0 else '') + str(round(x2.imag, 6)) + 'i'
             print(x1, x2)
     elif degree == 1:
+        c = 0 if not data[''] else c
         print(f"The solution is:\n{round((-c / b), 6)}")
     else:
         print("WHAT?!")
