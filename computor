@@ -42,7 +42,6 @@ def get_data(equation: list):
             i += 1
         else:
             break
-        # print(k, v)
         data[k].append(v)
         i += 1
     return data
@@ -90,14 +89,12 @@ def move_terms_to_left(equation):
             tmp_right.pop(0)
         tmp_right.pop(0)
         result= left_side + ['='] + (tmp_right if tmp_right else ['0'])
-        # print(' '.join(result))
         i += 1
     return result
 
 
 def reducer(data: dict):
     data = {k: [sum(v)] for k, v in data.items()}
-    # print(data)
     result = []
     for k, v in data.items():
         if v and v[0]:
@@ -109,7 +106,6 @@ def reducer(data: dict):
                 result.append((str(number) + '*' + k) if number != 1 else k)
             else:
                 result.append((str(number) + k))
-                # result.append((str(number) + k) if number != 1 else k)
 
     def is_solvable():
         for i in result:
@@ -119,9 +115,7 @@ def reducer(data: dict):
             return False
 
     if result:
-        # print(result)
         if is_solvable():
-            # print(result)
             result += ['=', '0']
             result.pop(0) if result[0] == '+' else result
             print(f"Reduced form {' '.join(result)}")
@@ -135,12 +129,10 @@ def reducer(data: dict):
 
 def solver(data: dict, degree: int):
     def sqrt(number): return number ** (1/2)
-    # print(data)
     a = data['X^2'][0] if data['X^2'] else 1
     b = data['X'][0] if data['X'] else 0
     c = data[''][0] if data[''] else 1
 
-    # print(f"a={a}, b={b}, c={c}")
     d = b * b - 4 * a * c
     if degree == 2:
         if d > 0:
@@ -180,9 +172,7 @@ def main():
     if parser():
         equation = argv[1]
         equation = move_terms_to_left(equation=equation)
-        # print(equation)
         data = get_data(equation=equation)
-        # print(data)
         data = reducer(data=data)
         if data:
             degree = get_degree(equation=' '.join(data))
@@ -193,5 +183,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # print(change_operation(sign='-'))
     main()
