@@ -118,7 +118,7 @@ def reducer(data: dict):
         if is_solvable():
             result += ['=', '0']
             result.pop(0) if result[0] == '+' else result
-            print(f"Reduced form {' '.join(result)}")
+            print(f"Reduced form: {' '.join(result)}")
             return result
         else:
             print("There no solutions.")
